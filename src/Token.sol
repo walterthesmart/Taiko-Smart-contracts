@@ -11,7 +11,7 @@ import {MintableBaseToken} from "./MintableBaseToken.sol";
 pragma solidity 0.8.20;
 
 contract WALTER is MintableBaseToken {
-    constructor() public MintableBaseToken("WALTER on Hekla", "WALT", 10000000000000000000000000) {
+    constructor() MintableBaseToken("WALTER on Hekla", "WALT", 10000000000000000000000000) {
     }
 
     function id() external pure returns (string memory _name) {

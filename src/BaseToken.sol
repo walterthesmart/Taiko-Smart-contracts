@@ -3,10 +3,13 @@
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IBaseToken} from "./interfaces/IBaseToken.sol";
 import {IYieldTracker} from "./interfaces/IYieldTracker.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 pragma solidity 0.8.20;
 
 contract BaseToken is IERC20, IBaseToken {
+    using SafeERC20 for IERC20;
+
     string public name;
     string public symbol;
     uint8 public constant decimals = 18;
@@ -40,7 +43,7 @@ contract BaseToken is IERC20, IBaseToken {
         string memory _name,
         string memory _symbol,
         uint256 _initialSupply
-    ) public {
+    ) {
         name = _name;
         symbol = _symbol;
         gov = msg.sender;
@@ -100,14 +103,14 @@ contract BaseToken is IERC20, IBaseToken {
         );
         _updateRewards(_account);
         nonStakingAccounts[_account] = true;
-        nonStakingSupply = nonStakingSupply.add(balances[_account]);
+        nonStakingSupply += balances[_account];
     }
 
     function removeNonStakingAccount(address _account) external onlyAdmin {
         require(nonStakingAccounts[_account], "BaseToken: _account not marked");
         _updateRewards(_account);
         nonStakingAccounts[_account] = false;
-        nonStakingSupply = nonStakingSupply.sub(balances[_account]);
+        nonStakingSupply -= balances[_account];
     }
 
     function recoverClaim(
@@ -128,7 +131,7 @@ contract BaseToken is IERC20, IBaseToken {
     }
 
     function totalStaked() external view override returns (uint256) {
-        return totalSupply.sub(nonStakingSupply);
+        return totalSupply - nonStakingSupply;
     }
 
     function balanceOf(
@@ -178,10 +181,7 @@ contract BaseToken is IERC20, IBaseToken {
             _transfer(_sender, _recipient, _amount);
             return true;
         }
-        uint256 nextAllowance = allowances[_sender][msg.sender].sub(
-            _amount,
-            "BaseToken: transfer amount exceeds allowance"
-        );
+        uint256 nextAllowance = allowances[_sender][msg.sender] - _amount;
         _approve(_sender, msg.sender, nextAllowance);
         _transfer(_sender, _recipient, _amount);
         return true;
@@ -192,11 +192,11 @@ contract BaseToken is IERC20, IBaseToken {
 
         _updateRewards(_account);
 
-        totalSupply = totalSupply.add(_amount);
-        balances[_account] = balances[_account].add(_amount);
+        totalSupply = totalSupply +_amount;
+        balances[_account] = balances[_account] +_amount;
 
         if (nonStakingAccounts[_account]) {
-            nonStakingSupply = nonStakingSupply.add(_amount);
+            nonStakingSupply = nonStakingSupply +_amount;
         }
 
         emit Transfer(address(0), _account, _amount);
@@ -210,14 +210,11 @@ contract BaseToken is IERC20, IBaseToken {
 
         _updateRewards(_account);
 
-        balances[_account] = balances[_account].sub(
-            _amount,
-            "BaseToken: burn amount exceeds balance"
-        );
-        totalSupply = totalSupply.sub(_amount);
+        balances[_account] = balances[_account] -   _amount;
+        totalSupply = totalSupply - _amount;
 
         if (nonStakingAccounts[_account]) {
-            nonStakingSupply = nonStakingSupply.sub(_amount);
+            nonStakingSupply = nonStakingSupply - _amount;
         }
 
         emit Transfer(_account, address(0), _amount);
@@ -247,17 +244,15 @@ contract BaseToken is IERC20, IBaseToken {
         _updateRewards(_sender);
         _updateRewards(_recipient);
 
-        balances[_sender] = balances[_sender].sub(
-            _amount,
-            "BaseToken: transfer amount exceeds balance"
-        );
-        balances[_recipient] = balances[_recipient].add(_amount);
+        balances[_sender] = balances[_sender] - _amount;
+        
+        balances[_recipient] = balances[_recipient] +_amount;
 
         if (nonStakingAccounts[_sender]) {
-            nonStakingSupply = nonStakingSupply.sub(_amount);
+            nonStakingSupply = nonStakingSupply -_amount;
         }
         if (nonStakingAccounts[_recipient]) {
-            nonStakingSupply = nonStakingSupply.add(_amount);
+            nonStakingSupply = nonStakingSupply +_amount;
         }
 
         emit Transfer(_sender, _recipient, _amount);
