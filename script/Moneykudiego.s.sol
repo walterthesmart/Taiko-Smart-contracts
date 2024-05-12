@@ -2,9 +2,9 @@
 pragma solidity 0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-import {WALTER} from "../src/Token.sol";
+import {MONEYKUDIEGO} from "../src/Token.sol";
 
-contract WALTScript is Script {
+contract MONEYKUDIEGOScript is Script {
     function setup() public {}
 
     function run() public {
@@ -13,7 +13,7 @@ contract WALTScript is Script {
         console.log("Deployer address: %s", account);
         vm.startBroadcast(deployerPrivateKey);
         // Deploy Token contract
-        WALTER token = new WALTER();
+        MONEYKUDIEGO token = new MONEYKUDIEGO();
         console.log("Contract deployed at %s", address(token));
         console.log("Token balance: %d", token.balanceOf(address(this)));
 

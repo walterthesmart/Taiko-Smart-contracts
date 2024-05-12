@@ -45,11 +45,11 @@ endif
 
 
 deploy:
-	@forge script script/Walt.s.sol:WALTScript $(NETWORK_ARGS)
+	@forge script script/MoneyKudiego.s.sol:MONEYKUDIEGOScript $(NETWORK_ARGS)
 
 # cast abi-encode "constructor(uint256)" 1000000000000000000000000 -> 0x00000000000000000000000000000000000000000000d3c21bcecceda1000000
 # Update with your contract address, constructor arguments and anything else
 verify:
-	@forge verify-contract 0xB52466342F35A0dCD7f796830C48fF04943b5A1F WALTER --etherscan-api-key=EWC3MARCNT2NRNU7AIQF3J25XSU4DAM9HD --watch --retries=2 --verifier-url=https://api.routescan.io/v2/network/testnet/evm/80085/etherscan/api/
+	@forge verify-contract 0xD3CcdF271B969f9e7d3d32DD9a82DeDd82B9DCe7 MONEYKUDIEGO --etherscan-api-key=EWC3MARCNT2NRNU7AIQF3J25XSU4DAM9HD --watch --retries=2 --verifier-url=https://api.routescan.io/v2/network/testnet/evm/80085/etherscan/api/
 mint:
 	@forge script script/Interactions.s.sol:MintVBERA $(NETWORK_ARGS)
