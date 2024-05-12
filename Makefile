@@ -51,5 +51,5 @@ deploy:
 # Update with your contract address, constructor arguments and anything else
 verify:
 	@forge verify-contract 0xD3CcdF271B969f9e7d3d32DD9a82DeDd82B9DCe7 MONEYKUDIEGO --etherscan-api-key=EWC3MARCNT2NRNU7AIQF3J25XSU4DAM9HD --watch --retries=2 --verifier-url=https://api.routescan.io/v2/network/testnet/evm/80085/etherscan/api/
-mint:
-	@forge script script/Interactions.s.sol:MintVBERA $(NETWORK_ARGS)
+transfer:
+	@forge script script/Interactions.s.sol:InteractrMKE $(NETWORK_ARGS)
