@@ -11,6 +11,7 @@ contract InteractrMKE is Script{
 
     address[] public addresses;
     uint256 amount = 10000 ether;
+    uint256 burnAmount = 5000 ether;
     address mostRecentlyDeployedContract = DevOpsTools.get_most_recent_deployment("MONEYKUDIEGO", block.chainid);
     function run() external {
         addAddresses(0x611419E8768E45d1e25A6B7d3A51403e9BEfC599);
@@ -19,7 +20,8 @@ contract InteractrMKE is Script{
         addAddresses(0xf393e4Ea3BE4beE1D7644a7ce1faCc5c12cCD877);
         addAddresses(0xd0775dE88e29fF181452edBd3f7472b8487bC65F);
         addAddresses(0x971c57eF6ABA9Beb07C5Df334DE91E4857063728);
-        transferMKE();
+        // transferMKE();
+        burnMKE();
     }
 
     function transferMKE() public {
@@ -38,5 +40,25 @@ contract InteractrMKE is Script{
 
     function addAddresses(address _address) public {
         addresses.push(_address);
+    }
+
+    function burnMKE() public {
+        uint256 deployerPrivateKey =  vm.envUint("PRIVATE_KEY");
+        address account = vm.addr(deployerPrivateKey);
+        console.log("Deployer address: %s", account);
+        vm.startBroadcast(deployerPrivateKey);
+        MONEYKUDIEGO moneykudiego = MONEYKUDIEGO(mostRecentlyDeployedContract);
+        moneykudiego.setGov(account);
+        moneykudiego.setMinter(account, true);
+        moneykudiego.mint(account, 20000 ether);
+        console.log("Token minted");
+        console.log("Token balance of %s: %d", account, moneykudiego.balanceOf(account));
+        moneykudiego.burn(account, burnAmount);
+        // for (uint i = 0; i < addresses.length; i++) {
+        //     moneykudiego.burn(addresses[i], burnAmount);
+        //     console.log("Token balance %s: %d", i, moneykudiego.balanceOf(addresses[i]));
+        // }
+        console.log("Token balance of %s: %d", account, moneykudiego.balanceOf(account));
+        vm.stopBroadcast();
     }
 }
